@@ -1,3 +1,5 @@
+import * as THREE from 'https://threejsfundamentals.org/threejs/resources/threejs/r122/build/three.module.js';
+
 /**
  * Scene setup
  */
@@ -5,39 +7,95 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
 scene.add(camera);
-camera.position.set( 0, 0, 5 );
+camera.position.set( 0, 0, 10 );
 // camera.lookAt(scene.position);
 
-const renderer = new THREE.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer({antialias: false});
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
-camera.position.z = 5;
 /**
  * Image
  */
-
 // Create a texture loader so we can load our image file
 let loader = new THREE.TextureLoader();
 
+const texture = loader.load('textures/sample-background.jpg');
+// Increase image sharpness
+texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+texture.minFilter = THREE.LinearFilter;
+
 // Load an image file into a custom material
-let  imageMaterial = new THREE.MeshLambertMaterial({
-    map: loader.load('textures/sample-background.jpg')
+let imageMaterial = new THREE.MeshBasicMaterial({
+    map: texture
 });
 
 // TODO - Update this so that it detects the aspect ratio of the image
 // Create a plane geometry for the image with a width of 10
 // and a height that preserves the image's aspect ratio
-let planeGeometry = new THREE.PlaneGeometry(10, 10*.75);
+const imageGeometry = new THREE.PlaneGeometry(5*2, 10*.75*2);
 
 // Combine our image geometry and material into a mesh
-let imageMesh = new THREE.Mesh( planeGeometry, imageMaterial );
+let backgroundMesh = new THREE.Mesh( imageGeometry, imageMaterial );
 
 // Set the position of the image mesh in the x,y,z dimensions
-imageMesh.position.set( 0,0,0 )
+// backgroundMesh.position.set( 0,0,0 )
 
-// Add the image to the scene
-scene.add( imageMesh );
+backgroundMesh.material.depthTest = false;
+backgroundMesh.material.depthWrite = false;
+
+// Add the image to the background scene scene
+let backgroundScene = new THREE.Scene();
+backgroundScene.add( camera );
+backgroundScene.add( backgroundMesh );
+
+
+/**
+ * Plane - used for the card, an example of how it can be positioned and rotated is here
+ */
+const cardGeometry = new THREE.PlaneGeometry( 5, 5, 32 );
+const cardMaterial = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+const card = new THREE.Mesh( cardGeometry, cardMaterial );
+card.rotation.y = 1;
+card.position.y = -6;
+// plane.rotation.y = 30;
+// plane.rotation.z = 3;
+scene.add( card );
+
+
+/**
+ * Cube - used for volume estimation
+ */
+const cubeGeometry = new THREE.BoxGeometry( 3, 3, 3 );
+const cubeMaterial = new THREE.MeshStandardMaterial( {color: 0x9ff9} );
+const cube = new THREE.Mesh( cubeGeometry, cubeMaterial );
+cubeMaterial.wireframe = true; // TODO - make this work
+// Set the rotation of the cube to match the rotation of the plane
+cube.rotation.x = card.rotation.x;
+cube.rotation.y = card.rotation.y;
+cube.rotation.z = card.rotation.z;
+
+scene.add( cube );
+
+
+/**
+ * Move on plane - move an object along a plane relative to the orientation of the card
+ */
+const moveOnPlane = (mesh, distance) => {
+    // Get a percentage to move based on the card's rotation relative to 90 degrees
+    const percentX = card.rotation.x / (Math.PI / 2);
+    const percentY = card.rotation.y / (Math.PI / 2);
+    const percentZ = card.rotation.z / (Math.PI / 2);
+
+    console.log("percentX: " + percentX);
+    console.log("percentY: " + percentY);
+    console.log("percentZ: " + percentZ);
+
+    // Move the mesh
+    mesh.position.x = mesh.position.x + distance * percentX;
+    mesh.position.y = mesh.position.y + distance * percentY;
+    mesh.position.z = mesh.position.z + distance * percentZ;
+}
 
 
 /**
@@ -52,9 +110,11 @@ scene.add( circle );
 /**
  * Click callbacks
  */
-imageMesh.name = 'imageMesh';
-imageMesh.callback = () => {
+backgroundMesh.name = 'imageMesh';
+backgroundMesh.callback = () => {
     console.log( 'mesh clicked' );
+    // TODO - this is testing
+    moveOnPlane(cube, 1);
 }
 circle.callback = () => {
     console.log( 'circle clicked' );
@@ -64,7 +124,7 @@ circle.callback = () => {
  * Click handler
  * https://stackoverflow.com/questions/12800150/catch-the-click-event-on-a-specific-mesh-in-the-renderer
  */
-let objects = [ circle, imageMesh ]; // Should probably put these in order for what we want to hit first
+let objects = [ circle, backgroundMesh ]; // Should probably put these in order for what we want to hit first
 let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
 
@@ -97,12 +157,17 @@ document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 
 // Add a point light with #fff color, .7 intensity, and 0 distance
 let light = new THREE.PointLight( 0xffffff, 1, 0 );
+const backgroundLight = new THREE.AmbientLight( 0x404040, 5 );
+// let backgroundLight = new THREE.PointLight( 0xffffff, 1, 0 );
 
 // Specify the light's position
 light.position.set( 0, 0, 100 );
+backgroundLight.position.set( 0, 0, 100 );
 
 // Add the light to the scene
-scene.add( light )
+backgroundScene.add( backgroundLight );
+scene.add( light );
+
 
 /**
  * Animate the scene
@@ -111,6 +176,10 @@ scene.add( light )
 // Render the scene in an animate loop
 function animate() {
     requestAnimationFrame( animate );
+    // The background is rendered on a separate scene to the objects
+    renderer.autoClear = false;
+    renderer.clear();
+    renderer.render( backgroundScene, camera );
     renderer.render( scene, camera );
 }
 animate();
