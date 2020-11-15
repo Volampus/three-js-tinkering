@@ -4,7 +4,10 @@
     <meta charset="utf-8">
     <title>My first three.js app</title>
     <style>
-        body { margin: 0; }
+        body {
+            margin: 0;
+        }
+
         canvas {
             display: block;
         }
@@ -12,6 +15,16 @@
     </style>
 </head>
 <body>
-    <script src="js/scene.js" type="module"></script>
+
+<!-- UI -->
+<label for="xSlider">X Slider</label>
+<input type="range" min="0" max="100" value="0"
+       id="xSlider" />
+<label for="ySlider">Y Slider</label>
+<input type="range" min="0" max="100" value="0"
+       id="ySlider" />
+
+<script src="js/scene.js" type="module"></script>
+
 </body>
 </html>

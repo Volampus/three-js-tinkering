@@ -56,7 +56,7 @@ backgroundScene.add( backgroundMesh );
 const cardGeometry = new THREE.PlaneGeometry( 5, 5, 32 );
 const cardMaterial = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
 const card = new THREE.Mesh( cardGeometry, cardMaterial );
-card.rotation.y = 1;
+card.rotation.x = -0.3;
 card.position.y = -6;
 // plane.rotation.y = 30;
 // plane.rotation.z = 3;
@@ -81,21 +81,36 @@ scene.add( cube );
 /**
  * Move on plane - move an object along a plane relative to the orientation of the card
  */
-const moveOnPlane = (mesh, distance) => {
-    // Get a percentage to move based on the card's rotation relative to 90 degrees
-    const percentX = card.rotation.x / (Math.PI / 2);
-    const percentY = card.rotation.y / (Math.PI / 2);
-    const percentZ = card.rotation.z / (Math.PI / 2);
-
-    console.log("percentX: " + percentX);
-    console.log("percentY: " + percentY);
-    console.log("percentZ: " + percentZ);
-
-    // Move the mesh
-    mesh.position.x = mesh.position.x + distance * percentX;
-    mesh.position.y = mesh.position.y + distance * percentY;
-    mesh.position.z = mesh.position.z + distance * percentZ;
+let totalXShift = 0;
+let totalYShift = 0;
+// Initialise the sliders to be zero
+document.getElementById('xSlider').value = 0;
+document.getElementById('ySlider').value = 0;
+const moveOnXAxis = () => {
+    // Get the distance by id
+    // We divide by 10, giving us 100 increments in the range 0 - 10
+    let distance = document.getElementById('xSlider').value / 10;
+    // console.log('value: ' + distance);
+    // Make this work as absolute rather than relative movement
+    let shiftSize = distance - totalXShift;
+    totalXShift += shiftSize;
+    // These translate the geometry along its rotated axis
+    // console.log(shiftSize);
+    cube.translateX(shiftSize);
 }
+const moveOnYAxis = () => {
+    // Get the distance by id
+    // We divide by 10, giving us 100 increments in the range 0 - 10
+    let distance = document.getElementById('ySlider').value / 10;
+    // console.log('value: ' + distance);
+    // Make this work as absolute rather than relative movement
+    let shiftSize = distance - totalYShift;
+    totalYShift += shiftSize;
+    // These translate the geometry along its rotated axis
+    // console.log(shiftSize);
+    cube.translateY(shiftSize);
+}
+// TODO - Don't think we need a Z slider
 
 
 /**
@@ -114,7 +129,7 @@ backgroundMesh.name = 'imageMesh';
 backgroundMesh.callback = () => {
     console.log( 'mesh clicked' );
     // TODO - this is testing
-    moveOnPlane(cube, 1);
+    // moveOnPlane(cube, 1);
 }
 circle.callback = () => {
     console.log( 'circle clicked' );
@@ -124,13 +139,16 @@ circle.callback = () => {
  * Click handler
  * https://stackoverflow.com/questions/12800150/catch-the-click-event-on-a-specific-mesh-in-the-renderer
  */
+document.getElementById('xSlider').addEventListener('input', moveOnXAxis);
+document.getElementById('ySlider').addEventListener('input', moveOnYAxis);
+
 let objects = [ circle, backgroundMesh ]; // Should probably put these in order for what we want to hit first
 let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
 
 const onDocumentMouseDown = ( event ) => {
 
-    event.preventDefault();
+    // event.preventDefault();
 
     mouse.x = ( event.clientX / renderer.domElement.clientWidth ) * 2 - 1;
     mouse.y = - ( event.clientY / renderer.domElement.clientHeight ) * 2 + 1;
