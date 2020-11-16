@@ -14,6 +14,7 @@
 
     </style>
 </head>
+<body>
 
 <!-- UI -->
 <label for="xSlider">X Slider</label>
@@ -31,8 +32,28 @@
 <label for="zScaleSlider">Z Scale Slider</label>
 <input type="range" min="0" max="100" value="10"
        id="zScaleSlider"/>
-<input type="button" id="cubeButton" value="Use Cube" />
-<input type="button" id="hemisphereButton" value="Use Hemisphere" />
+<input type="button" id="cubeButton" value="Use Cube"/>
+<input type="button" id="hemisphereButton" value="Use Hemisphere"/>
+<br>
+<h3>Plane Manipulation</h3>
+<label for="rotatePlaneX">Rotate Plane X</label>
+<input type="range" min="-90" max="90" value="0"
+       id="rotatePlaneX"/>
+<label for="rotatePlaneY">Rotate Plane Y</label>
+<input type="range" min="-90" max="90" value="0"
+       id="rotatePlaneY"/>
+<label for="rotatePlaneZ">Rotate Plane Z</label>
+<input type="range" min="-90" max="90" value="0"
+       id="rotatePlaneZ"/>
+<label for="movePlaneX">Move Plane X</label>
+<input type="range" min="-100" max="100" value="0"
+       id="movePlaneX"/>
+<label for="movePlaneY">Move Plane Y</label>
+<input type="range" min="-100" max="100" value="0"
+       id="movePlaneY"/>
+<label for="movePlaneZ">Move Plane Z (Changes how large we appear)</label>
+<input type="range" min="-100" max="100" value="0"
+       id="movePlaneZ"/>
 
 <script src="js/scene.js" type="module"></script>
 

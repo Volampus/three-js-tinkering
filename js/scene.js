@@ -3,6 +3,7 @@ import * as THREE from 'https://threejsfundamentals.org/threejs/resources/threej
 /**
  * Scene setup
  */
+// TODO - fix with rescaling of window - scrollbars also seem to affect detecting input events
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
@@ -53,11 +54,11 @@ backgroundScene.add(backgroundMesh);
 /**
  * Plane - used for the card, an example of how it can be positioned and rotated is here
  */
-const cardGeometry = new THREE.PlaneGeometry(5, 5, 32);
+// This is the dimension ratio of the card taken from my measurements
+const cardGeometry = new THREE.PlaneGeometry(8.5 / 2, 5 / 2, 32);
 const cardMaterial = new THREE.MeshBasicMaterial({color: 0xffff00, side: THREE.DoubleSide});
 const card = new THREE.Mesh(cardGeometry, cardMaterial);
-card.rotation.x = -1;
-card.position.y = -6;
+card.position.y = -3;
 // plane.rotation.y = 30;
 // plane.rotation.z = 3;
 scene.add(card);
@@ -201,7 +202,125 @@ const scaleZ = () =>
 
 
 /**
+ * Rotate the plane
+ */
+const rotatePlaneX = () =>
+{
+    // Receive input in the range of (-90) - 90
+    // Convert to radians
+    let rotation = document.getElementById('rotatePlaneX').value * Math.PI / 180;
+    // console.log(rotation)
+    card.rotation.x = rotation;
+    initialiseCube();
+}
+const rotatePlaneY = () =>
+{
+    // Receive input in the range of (-90) - 90
+    // Convert to radians
+    let rotation = document.getElementById('rotatePlaneY').value * Math.PI / 180;
+    // console.log(rotation)
+    card.rotation.y = rotation;
+    initialiseCube();
+}
+const rotatePlaneZ = () =>
+{
+    // Receive input in the range of (-90) - 90
+    // Convert to radians
+    let rotation = document.getElementById('rotatePlaneZ').value * Math.PI / 180;
+    // console.log(rotation)
+    card.rotation.z = rotation;
+    initialiseCube();
+}
+
+// Update the Mesh so that it matches the rotation of the card
+const updateMeshRotation = () =>
+{
+    cube.rotation.x = card.rotation.x;
+    cube.rotation.y = card.rotation.y;
+    cube.rotation.z = card.rotation.z;
+    hemisphere.rotation.x = card.rotation.x;
+    hemisphere.rotation.y = card.rotation.y;
+    hemisphere.rotation.z = card.rotation.z;
+}
+
+
+/**
+ * Move the plane
+ */
+let planeTotalXShift = 0;
+let planeTotalYShift = 0;
+let planeTotalZShift = 0;
+// Initialise the sliders to be zero
+document.getElementById('movePlaneX').value = 0;
+document.getElementById('movePlaneY').value = 0;
+document.getElementById('movePlaneZ').value = 0;
+const movePlaneOnXAxis = () =>
+{
+    // Get the distance by id
+    // We divide by 10, giving us 100 increments in the range (-10) - 10
+    let distance = document.getElementById('movePlaneX').value / 20;
+    // console.log('value: ' + distance);
+    // Make this work as absolute rather than relative movement
+    let shiftSize = distance - planeTotalXShift;
+    planeTotalXShift += shiftSize;
+    // These translate the geometry along its rotated axis
+    // console.log(shiftSize);
+    card.translateX(shiftSize);
+}
+const movePlaneOnYAxis = () =>
+{
+    // Get the distance by id
+    // We divide by 10, giving us 100 increments in the range (-10) - 10
+    let distance = document.getElementById('movePlaneY').value / 20;
+    // console.log('value: ' + distance);
+    // Make this work as absolute rather than relative movement
+    let shiftSize = distance - planeTotalYShift;
+    planeTotalYShift += shiftSize;
+    // These translate the geometry along its rotated axis
+    // console.log(shiftSize);
+    card.translateY(shiftSize);
+}
+const movePlaneOnZAxis = () =>
+{
+    // Get the distance by id
+    // We divide by 10, giving us 100 increments in the range (-10) - 10
+    let distance = document.getElementById('movePlaneZ').value / 20;
+    // console.log('value: ' + distance);
+    // Make this work as absolute rather than relative movement
+    let shiftSize = distance - planeTotalZShift;
+    planeTotalZShift += shiftSize;
+    // These translate the geometry along its rotated axis
+    // console.log(shiftSize);
+    card.translateZ(shiftSize);
+}
+
+
+/**
+ * Initialise Estimation Objects
+ */
+const initialiseCube = () =>
+{
+    cardGeometry.computeBoundingBox();
+    let center = new THREE.Vector3(0, 0, 0);
+    cardGeometry.boundingBox.getCenter(center);
+    // console.log('local center: ' + JSON.stringify(center))
+    card.localToWorld(center);
+    // console.log('global center: ' + JSON.stringify(center));
+    cube.position.x = card.position.x;
+    cube.position.y = card.position.y;
+    cube.position.z = card.position.z;
+
+    cube.rotation.x = card.rotation.x;
+    cube.rotation.y = card.rotation.y;
+    cube.rotation.z = card.rotation.z;
+
+    cube.translateZ(1.5);
+}
+
+
+/**
  * Dot
+ * TODO - testing
  */
 const circleGeometry = new THREE.CircleGeometry(0.1, 32);
 const circleMaterial = new THREE.MeshBasicMaterial({color: 0xffff00});
@@ -233,6 +352,7 @@ const swapToCube = () =>
 {
     scene.remove(hemisphere);
     scene.add(cube);
+    initialiseCube();
     activeMesh = cube;
     activeGeometry = cubeGeometry;
 }
@@ -241,6 +361,7 @@ const swapToHemisphere = () =>
 {
     scene.remove(cube);
     scene.add(hemisphere);
+    // TODO - initialise
     activeMesh = hemisphere;
     activeGeometry = hemisphereGeom;
 }
@@ -256,6 +377,15 @@ document.getElementById('ySlider').addEventListener('input', moveOnYAxis);
 document.getElementById('xScaleSlider').addEventListener('input', scaleX);
 document.getElementById('yScaleSlider').addEventListener('input', scaleY);
 document.getElementById('zScaleSlider').addEventListener('input', scaleZ);
+
+document.getElementById('rotatePlaneX').addEventListener('input', rotatePlaneX);
+document.getElementById('rotatePlaneY').addEventListener('input', rotatePlaneY);
+document.getElementById('rotatePlaneZ').addEventListener('input', rotatePlaneZ);
+
+document.getElementById('movePlaneX').addEventListener('input', movePlaneOnXAxis);
+document.getElementById('movePlaneY').addEventListener('input', movePlaneOnYAxis);
+document.getElementById('movePlaneZ').addEventListener('input', movePlaneOnZAxis);
+
 
 document.getElementById('cubeButton').addEventListener('click', swapToCube);
 document.getElementById('hemisphereButton').addEventListener('click', swapToHemisphere);
