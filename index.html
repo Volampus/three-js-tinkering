@@ -14,15 +14,25 @@
 
     </style>
 </head>
-<body>
 
 <!-- UI -->
 <label for="xSlider">X Slider</label>
-<input type="range" min="0" max="100" value="0"
-       id="xSlider" />
+<input type="range" min="-100" max="100" value="0"
+       id="xSlider"/>
 <label for="ySlider">Y Slider</label>
-<input type="range" min="0" max="100" value="0"
-       id="ySlider" />
+<input type="range" min="-100" max="100" value="0"
+       id="ySlider"/>
+<label for="xScaleSlider">X Scale Slider</label>
+<input type="range" min="0" max="100" value="10"
+       id="xScaleSlider"/>
+<label for="yScaleSlider">Y Scale Slider</label>
+<input type="range" min="0" max="100" value="10"
+       id="yScaleSlider"/>
+<label for="zScaleSlider">Z Scale Slider</label>
+<input type="range" min="0" max="100" value="10"
+       id="zScaleSlider"/>
+<input type="button" id="cubeButton" value="Use Cube" />
+<input type="button" id="hemisphereButton" value="Use Hemisphere" />
 
 <script src="js/scene.js" type="module"></script>
 
