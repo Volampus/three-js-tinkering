@@ -129,7 +129,23 @@ const moveOnXAxis = () =>
     totalXShift += shiftSize;
     // These translate the geometry along its rotated axis
     // console.log(shiftSize);
-    activeMesh.translateX(shiftSize);
+    activeMesh.translateX(shiftSize)
+    // let yRotationPercent = activeMesh.rotation.y / (Math.PI / 2);
+    // let zRotationPercent = activeMesh.rotation.z / (Math.PI / 2);
+    // console.log(activeMesh.rotation.z)
+    // console.log(zRotationPercent)
+    // activeMesh.translateY(-(shiftSize * zRotationPercent));
+    // // console.log(-(shiftSize * zRotationPercent))
+    // // console.log(shiftSize * (1 - zRotationPercent))
+    // activeMesh.translateX(shiftSize * (1 - Math.abs(zRotationPercent)));
+    // let zRotationTangent = Math.tan(activeMesh.rotation.z)
+    // if (zRotationTangent !== 0 ){
+    //     activeMesh.translateY( zRotationTangent * shiftSize )
+    //     activeMesh.translateX( shiftSize / zRotationTangent )
+    // }
+    // else {
+    //     activeMesh.translateX( shiftSize )
+    // }
 }
 const moveOnYAxis = () =>
 {
