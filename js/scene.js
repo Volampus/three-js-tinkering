@@ -116,8 +116,8 @@ hemisphere.rotation.z = card.rotation.z;
 let totalXShift = 0;
 let totalYShift = 0;
 // Initialise the sliders to be zero
-document.getElementById('xSlider').value = 0;
-document.getElementById('ySlider').value = 0;
+parent.document.getElementById('xSlider').value = 0;
+parent.document.getElementById('ySlider').value = 0;
 const moveOnXAxis = () =>
 {
     // Get the distance by id
@@ -170,14 +170,14 @@ let totalXScale = 1;
 let totalYScale = 1;
 let totalZScale = 1;
 // Initialise the sliders to be zero
-document.getElementById('xScaleSlider').value = 10;
-document.getElementById('yScaleSlider').value = 10;
-document.getElementById('zScaleSlider').value = 10;
+parent.document.getElementById('xScaleSlider').value = 10;
+parent.document.getElementById('yScaleSlider').value = 10;
+parent.document.getElementById('zScaleSlider').value = 10;
 const scaleX = () =>
 {
     // Get the scale by id
     // Taking the value from 0 - 100, we can scale up or down by a factor of 10
-    let scale = document.getElementById('xScaleSlider').value / 10;
+    let scale = parent.document.getElementById('xScaleSlider').value / 10;
     // console.log('value: ' + distance);
     // Make this work as absolute rather than relative movement
     if (scale !== 0)
@@ -191,7 +191,7 @@ const scaleY = () =>
 {
     // Get the scale by id
     // Taking the value from 0 - 100, we can scale up or down by a factor of 10
-    let scale = document.getElementById('yScaleSlider').value / 10;
+    let scale = parent.document.getElementById('yScaleSlider').value / 10;
     // console.log('value: ' + distance);
     // Make this work as absolute rather than relative movement
     if (scale !== 0)
@@ -205,7 +205,7 @@ const scaleZ = () =>
 {
     // Get the scale by id
     // Taking the value from 0 - 100, we can scale up or down by a factor of 10
-    let scale = document.getElementById('zScaleSlider').value / 10;
+    let scale = parent.document.getElementById('zScaleSlider').value / 10;
     // console.log('value: ' + distance);
     // Make this work as absolute rather than relative movement
     if (scale !== 0)
@@ -224,7 +224,7 @@ const rotatePlaneX = () =>
 {
     // Receive input in the range of (-90) - 90
     // Convert to radians
-    let rotation = document.getElementById('rotatePlaneX').value * Math.PI / 180;
+    let rotation = parent.document.getElementById('rotatePlaneX').value * Math.PI / 180;
     // console.log(rotation)
     card.rotation.x = rotation;
     initialiseCube();
@@ -233,7 +233,7 @@ const rotatePlaneY = () =>
 {
     // Receive input in the range of (-90) - 90
     // Convert to radians
-    let rotation = document.getElementById('rotatePlaneY').value * Math.PI / 180;
+    let rotation = parent.document.getElementById('rotatePlaneY').value * Math.PI / 180;
     // console.log(rotation)
     card.rotation.y = rotation;
     initialiseCube();
@@ -242,7 +242,7 @@ const rotatePlaneZ = () =>
 {
     // Receive input in the range of (-90) - 90
     // Convert to radians
-    let rotation = document.getElementById('rotatePlaneZ').value * Math.PI / 180;
+    let rotation = parent.document.getElementById('rotatePlaneZ').value * Math.PI / 180;
     // console.log(rotation)
     card.rotation.z = rotation;
     initialiseCube();
@@ -267,14 +267,14 @@ let planeTotalXShift = 0;
 let planeTotalYShift = 0;
 let planeTotalZShift = 0;
 // Initialise the sliders to be zero
-document.getElementById('movePlaneX').value = 0;
-document.getElementById('movePlaneY').value = 0;
-document.getElementById('movePlaneZ').value = 0;
+parent.document.getElementById('movePlaneX').value = 0;
+parent.document.getElementById('movePlaneY').value = 0;
+parent.document.getElementById('movePlaneZ').value = 0;
 const movePlaneOnXAxis = () =>
 {
     // Get the distance by id
     // We divide by 10, giving us 100 increments in the range (-10) - 10
-    let distance = document.getElementById('movePlaneX').value / 20;
+    let distance = parent.document.getElementById('movePlaneX').value / 20;
     // console.log('value: ' + distance);
     // Make this work as absolute rather than relative movement
     let shiftSize = distance - planeTotalXShift;
@@ -287,7 +287,7 @@ const movePlaneOnYAxis = () =>
 {
     // Get the distance by id
     // We divide by 10, giving us 100 increments in the range (-10) - 10
-    let distance = document.getElementById('movePlaneY').value / 20;
+    let distance = parent.document.getElementById('movePlaneY').value / 20;
     // console.log('value: ' + distance);
     // Make this work as absolute rather than relative movement
     let shiftSize = distance - planeTotalYShift;
@@ -300,7 +300,7 @@ const movePlaneOnZAxis = () =>
 {
     // Get the distance by id
     // We divide by 10, giving us 100 increments in the range (-10) - 10
-    let distance = document.getElementById('movePlaneZ').value / 20;
+    let distance = parent.document.getElementById('movePlaneZ').value / 20;
     // console.log('value: ' + distance);
     // Make this work as absolute rather than relative movement
     let shiftSize = distance - planeTotalZShift;
@@ -387,24 +387,24 @@ const swapToHemisphere = () =>
  * Click handler
  * https://stackoverflow.com/questions/12800150/catch-the-click-event-on-a-specific-mesh-in-the-renderer
  */
-document.getElementById('xSlider').addEventListener('input', moveOnXAxis);
-document.getElementById('ySlider').addEventListener('input', moveOnYAxis);
+parent.document.getElementById('xSlider').addEventListener('input', moveOnXAxis);
+parent.document.getElementById('ySlider').addEventListener('input', moveOnYAxis);
 
-document.getElementById('xScaleSlider').addEventListener('input', scaleX);
-document.getElementById('yScaleSlider').addEventListener('input', scaleY);
-document.getElementById('zScaleSlider').addEventListener('input', scaleZ);
+parent.document.getElementById('xScaleSlider').addEventListener('input', scaleX);
+parent.document.getElementById('yScaleSlider').addEventListener('input', scaleY);
+parent.document.getElementById('zScaleSlider').addEventListener('input', scaleZ);
 
-document.getElementById('rotatePlaneX').addEventListener('input', rotatePlaneX);
-document.getElementById('rotatePlaneY').addEventListener('input', rotatePlaneY);
-document.getElementById('rotatePlaneZ').addEventListener('input', rotatePlaneZ);
+parent.document.getElementById('rotatePlaneX').addEventListener('input', rotatePlaneX);
+parent.document.getElementById('rotatePlaneY').addEventListener('input', rotatePlaneY);
+parent.document.getElementById('rotatePlaneZ').addEventListener('input', rotatePlaneZ);
 
-document.getElementById('movePlaneX').addEventListener('input', movePlaneOnXAxis);
-document.getElementById('movePlaneY').addEventListener('input', movePlaneOnYAxis);
-document.getElementById('movePlaneZ').addEventListener('input', movePlaneOnZAxis);
+parent.document.getElementById('movePlaneX').addEventListener('input', movePlaneOnXAxis);
+parent.document.getElementById('movePlaneY').addEventListener('input', movePlaneOnYAxis);
+parent.document.getElementById('movePlaneZ').addEventListener('input', movePlaneOnZAxis);
 
 
-document.getElementById('cubeButton').addEventListener('click', swapToCube);
-document.getElementById('hemisphereButton').addEventListener('click', swapToHemisphere);
+parent.document.getElementById('cubeButton').addEventListener('click', swapToCube);
+parent.document.getElementById('hemisphereButton').addEventListener('click', swapToHemisphere);
 
 let objects = [circle, backgroundMesh]; // Should probably put these in order for what we want to hit first
 let raycaster = new THREE.Raycaster();
