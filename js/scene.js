@@ -55,13 +55,25 @@ backgroundScene.add(backgroundMesh);
  * Plane - used for the card, an example of how it can be positioned and rotated is here
  */
 // This is the dimension ratio of the card taken from my measurements
-const cardGeometry = new THREE.PlaneGeometry(8.5 / 2, 5 / 2, 32);
+const cardGeometry = new THREE.PlaneGeometry(8.5 / 2, 5 / 2, 32, 32);
 const cardMaterial = new THREE.MeshBasicMaterial({color: 0xffff00, side: THREE.DoubleSide});
 const card = new THREE.Mesh(cardGeometry, cardMaterial);
 card.position.y = -3;
 // plane.rotation.y = 30;
 // plane.rotation.z = 3;
 scene.add(card);
+
+/**
+ * Plane - used for collision detection
+ * This plane is matched to the orientation of the card but covers the whole screen for collision detection
+ */
+// const collisionGeometry = new THREE.PlaneGeometry(100, 100, 32, 32);
+// const collisionMaterial = new THREE.MeshBasicMaterial({transparent: true, side: THREE.DoubleSide});
+// const collisionPlane = new THREE.Mesh(collisionGeometry, collisionMaterial);
+// collisionPlane.position.y = -3;
+// // plane.rotation.y = 30;
+// // plane.rotation.z = 3;
+// scene.add(collisionPlane);
 
 
 /**
@@ -122,14 +134,58 @@ const moveOnXAxis = () =>
 {
     // Get the distance by id
     // We divide by 10, giving us 100 increments in the range (-10) - 10
-    let distance = document.getElementById('xSlider').value / 10;
+    let distance = parent.document.getElementById('xSlider').value / 10;
     // console.log('value: ' + distance);
     // Make this work as absolute rather than relative movement
     let shiftSize = distance - totalXShift;
     totalXShift += shiftSize;
+
+    activeMesh.position.x += shiftSize;
+    // activeMesh.position.z -= Math.tan(card.rotation.y) * shiftSize
+
+    // TODO - remove this. This was all testing and pretty inefficient
+
+    // let collision = false
+    // let counter = 0;
+    // while (!collision)
+    // {
+    //     if (counter >= 50) {
+    //         // TODO - throw error
+    //         break;
+    //     }
+    //     counter++;
+    //     for (let vertexIndex = 0; vertexIndex < activeGeometry.vertices.length; vertexIndex++)
+    //     {
+    //         // console.log('for loop runs')
+    //         let localVertex = activeGeometry.vertices[vertexIndex].clone();
+    //         let globalVertex = localVertex.applyMatrix4(activeMesh.matrix);
+    //         let directionVector = globalVertex.sub(activeMesh.position);
+    //
+    //         activeGeometry.computeBoundingBox();
+    //         let center = activeGeometry.boundingBox.getCenter();
+    //         activeMesh.localToWorld( center );
+    //
+    //         let ray = new THREE.Raycaster(center, directionVector.clone().normalize());
+    //         let collisionResults = ray.intersectObjects([collisionPlane]);
+    //         if (collisionResults.length > 0)
+    //         {
+    //
+    //             // a collision occurred... do something...
+    //             activeMesh.position.copy( collisionResults[0].point ).add( collisionResults[0].face.normal );
+    //             collision = true;
+    //         }
+    //     }
+    //     console.log(activeMesh.position.z)
+    //     if (!collision)
+    //     {
+    //         // Decrement the z position until a collision occurs
+    //         activeMesh.position.z -= 0.01;
+    //     }
+    // }
+
     // These translate the geometry along its rotated axis
     // console.log(shiftSize);
-    activeMesh.translateX(shiftSize)
+    // activeMesh.translateX(shiftSize)
     // let yRotationPercent = activeMesh.rotation.y / (Math.PI / 2);
     // let zRotationPercent = activeMesh.rotation.z / (Math.PI / 2);
     // console.log(activeMesh.rotation.z)
@@ -151,14 +207,14 @@ const moveOnYAxis = () =>
 {
     // Get the distance by id
     // We divide by 10, giving us 100 increments in the range (-10) - 10
-    let distance = document.getElementById('ySlider').value / 10;
+    let distance = parent.document.getElementById('ySlider').value / 10;
     // console.log('value: ' + distance);
     // Make this work as absolute rather than relative movement
     let shiftSize = distance - totalYShift;
     totalYShift += shiftSize;
     // These translate the geometry along its rotated axis
     // console.log(shiftSize);
-    activeMesh.translateY(shiftSize);
+    activeMesh.translateY(shiftSize)
 }
 // TODO - Don't think we need a Z slider
 
@@ -227,6 +283,7 @@ const rotatePlaneX = () =>
     let rotation = parent.document.getElementById('rotatePlaneX').value * Math.PI / 180;
     // console.log(rotation)
     card.rotation.x = rotation;
+    // collisionPlane.rotation.x = rotation;
     initialiseCube();
 }
 const rotatePlaneY = () =>
@@ -236,6 +293,7 @@ const rotatePlaneY = () =>
     let rotation = parent.document.getElementById('rotatePlaneY').value * Math.PI / 180;
     // console.log(rotation)
     card.rotation.y = rotation;
+    // collisionPlane.rotation.y = rotation;
     initialiseCube();
 }
 const rotatePlaneZ = () =>
@@ -245,6 +303,7 @@ const rotatePlaneZ = () =>
     let rotation = parent.document.getElementById('rotatePlaneZ').value * Math.PI / 180;
     // console.log(rotation)
     card.rotation.z = rotation;
+    // collisionPlane.rotation.z = rotation;
     initialiseCube();
 }
 
@@ -330,6 +389,7 @@ const initialiseCube = () =>
     cube.rotation.y = card.rotation.y;
     cube.rotation.z = card.rotation.z;
 
+    // This only moves the geometry relative to the location of the origin. NOT the actual location of the origin
     cube.translateZ(1.5);
 }
 
