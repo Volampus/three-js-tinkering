@@ -6,9 +6,11 @@ import * as THREE from 'https://threejsfundamentals.org/threejs/resources/threej
 // TODO - fix with rescaling of window - scrollbars also seem to affect detecting input events
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const backgroundCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
 scene.add(camera);
 camera.position.set(0, 0, 10);
+backgroundCamera.position.set(0, 0, 10)
 // camera.lookAt(scene.position);
 
 const renderer = new THREE.WebGLRenderer({antialias: false});
@@ -47,7 +49,7 @@ backgroundMesh.material.depthWrite = false;
 
 // Add the image to the background scene scene
 let backgroundScene = new THREE.Scene();
-backgroundScene.add(camera);
+backgroundScene.add(backgroundCamera);
 backgroundScene.add(backgroundMesh);
 
 
@@ -274,37 +276,37 @@ const scaleZ = () =>
 
 
 /**
- * Rotate the plane
+ * Rotate the camera
  */
 const rotatePlaneX = () =>
 {
     // Receive input in the range of (-90) - 90
     // Convert to radians
-    let rotation = parent.document.getElementById('rotatePlaneX').value * Math.PI / 180;
+    let rotation = parent.document.getElementById('rotateCameraX').value * Math.PI / 180;
     // console.log(rotation)
-    card.rotation.x = rotation;
+    camera.rotation.x = rotation;
     // collisionPlane.rotation.x = rotation;
-    initialiseCube();
+    // initialiseCube();
 }
 const rotatePlaneY = () =>
 {
     // Receive input in the range of (-90) - 90
     // Convert to radians
-    let rotation = parent.document.getElementById('rotatePlaneY').value * Math.PI / 180;
+    let rotation = parent.document.getElementById('rotateCameraY').value * Math.PI / 180;
     // console.log(rotation)
-    card.rotation.y = rotation;
+    camera.rotation.y = rotation;
     // collisionPlane.rotation.y = rotation;
-    initialiseCube();
+    // initialiseCube();
 }
 const rotatePlaneZ = () =>
 {
     // Receive input in the range of (-90) - 90
     // Convert to radians
-    let rotation = parent.document.getElementById('rotatePlaneZ').value * Math.PI / 180;
+    let rotation = parent.document.getElementById('rotateCameraZ').value * Math.PI / 180;
     // console.log(rotation)
-    card.rotation.z = rotation;
+    camera.rotation.z = rotation;
     // collisionPlane.rotation.z = rotation;
-    initialiseCube();
+    // initialiseCube();
 }
 
 // Update the Mesh so that it matches the rotation of the card
@@ -326,47 +328,50 @@ let planeTotalXShift = 0;
 let planeTotalYShift = 0;
 let planeTotalZShift = 0;
 // Initialise the sliders to be zero
-parent.document.getElementById('movePlaneX').value = 0;
-parent.document.getElementById('movePlaneY').value = 0;
-parent.document.getElementById('movePlaneZ').value = 0;
+parent.document.getElementById('moveCameraX').value = 0;
+parent.document.getElementById('moveCameraY').value = 0;
+parent.document.getElementById('moveCameraZ').value = 0;
 const movePlaneOnXAxis = () =>
 {
     // Get the distance by id
     // We divide by 10, giving us 100 increments in the range (-10) - 10
-    let distance = parent.document.getElementById('movePlaneX').value / 20;
+    let distance = parent.document.getElementById('moveCameraX').value / 20;
     // console.log('value: ' + distance);
     // Make this work as absolute rather than relative movement
-    let shiftSize = distance - planeTotalXShift;
-    planeTotalXShift += shiftSize;
+    // let shiftSize = distance - planeTotalXShift;
+    // planeTotalXShift += shiftSize;
+    camera.position.x = distance;
     // These translate the geometry along its rotated axis
     // console.log(shiftSize);
-    card.translateX(shiftSize);
+    // card.translateX(shiftSize);
 }
 const movePlaneOnYAxis = () =>
 {
     // Get the distance by id
     // We divide by 10, giving us 100 increments in the range (-10) - 10
-    let distance = parent.document.getElementById('movePlaneY').value / 20;
+    let distance = parent.document.getElementById('moveCameraY').value / 20;
     // console.log('value: ' + distance);
     // Make this work as absolute rather than relative movement
-    let shiftSize = distance - planeTotalYShift;
-    planeTotalYShift += shiftSize;
+    // let shiftSize = distance - planeTotalYShift;
+    // planeTotalYShift += shiftSize;
+    camera.position.y = distance;
     // These translate the geometry along its rotated axis
     // console.log(shiftSize);
-    card.translateY(shiftSize);
+    // card.translateY(shiftSize);
 }
 const movePlaneOnZAxis = () =>
 {
     // Get the distance by id
     // We divide by 10, giving us 100 increments in the range (-10) - 10
-    let distance = parent.document.getElementById('movePlaneZ').value / 20;
+    let distance = parent.document.getElementById('moveCameraZ').value / 20;
     // console.log('value: ' + distance);
     // Make this work as absolute rather than relative movement
-    let shiftSize = distance - planeTotalZShift;
-    planeTotalZShift += shiftSize;
+    // let shiftSize = distance - planeTotalZShift;
+    // planeTotalZShift += shiftSize;
+    camera.position.z = distance + 10; // Initial position
     // These translate the geometry along its rotated axis
     // console.log(shiftSize);
-    card.translateZ(shiftSize);
+    // card.translateZ(shiftSize);
 }
 
 
@@ -454,13 +459,13 @@ parent.document.getElementById('xScaleSlider').addEventListener('input', scaleX)
 parent.document.getElementById('yScaleSlider').addEventListener('input', scaleY);
 parent.document.getElementById('zScaleSlider').addEventListener('input', scaleZ);
 
-parent.document.getElementById('rotatePlaneX').addEventListener('input', rotatePlaneX);
-parent.document.getElementById('rotatePlaneY').addEventListener('input', rotatePlaneY);
-parent.document.getElementById('rotatePlaneZ').addEventListener('input', rotatePlaneZ);
+parent.document.getElementById('rotateCameraX').addEventListener('input', rotatePlaneX);
+parent.document.getElementById('rotateCameraY').addEventListener('input', rotatePlaneY);
+parent.document.getElementById('rotateCameraZ').addEventListener('input', rotatePlaneZ);
 
-parent.document.getElementById('movePlaneX').addEventListener('input', movePlaneOnXAxis);
-parent.document.getElementById('movePlaneY').addEventListener('input', movePlaneOnYAxis);
-parent.document.getElementById('movePlaneZ').addEventListener('input', movePlaneOnZAxis);
+parent.document.getElementById('moveCameraX').addEventListener('input', movePlaneOnXAxis);
+parent.document.getElementById('moveCameraY').addEventListener('input', movePlaneOnYAxis);
+parent.document.getElementById('moveCameraZ').addEventListener('input', movePlaneOnZAxis);
 
 
 parent.document.getElementById('cubeButton').addEventListener('click', swapToCube);
@@ -524,7 +529,7 @@ function animate()
     // The background is rendered on a separate scene to the objects
     renderer.autoClear = false;
     renderer.clear();
-    renderer.render(backgroundScene, camera);
+    renderer.render(backgroundScene, backgroundCamera);
     renderer.render(scene, camera);
 }
 
