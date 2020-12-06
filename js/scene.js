@@ -67,18 +67,20 @@ scene.add(card);
  * Plane - used for collision detection
  * This plane is matched to the orientation of the card but covers the whole screen for collision detection
  */
-// const collisionGeometry = new THREE.PlaneGeometry(100, 100, 32, 32);
-// const collisionMaterial = new THREE.MeshBasicMaterial({transparent: true, side: THREE.DoubleSide});
-// const collisionPlane = new THREE.Mesh(collisionGeometry, collisionMaterial);
-// collisionPlane.position.y = -3;
-// // plane.rotation.y = 30;
-// // plane.rotation.z = 3;
-// scene.add(collisionPlane);
+const collisionGeometry = new THREE.PlaneGeometry(100, 100, 32, 32);
+const collisionMaterial = new THREE.MeshBasicMaterial({transparent: true, side: THREE.DoubleSide});
+const collisionPlane = new THREE.Mesh(collisionGeometry, collisionMaterial);
+collisionPlane.position.y = -3;
+// plane.rotation.y = 30;
+// plane.rotation.z = 3;
+scene.add(collisionPlane);
 
 
 /**
  * Cube - used for volume estimation
  */
+// Create a container for the cube
+const cubeContainer = new THREE.Object3D();
 // Here we are using the segment attributes to improve the wireframe
 const cubeGeometry = new THREE.BoxGeometry(3, 3, 3, 5, 5, 5);
 const cubeMaterial = new THREE.MeshStandardMaterial({color: 0x9ff9});
@@ -89,7 +91,8 @@ cube.rotation.x = card.rotation.x;
 cube.rotation.y = card.rotation.y;
 cube.rotation.z = card.rotation.z;
 
-scene.add(cube);
+// cubeContainer.add(cube);
+scene.add( cube );
 // Used when determining which object to apply modifiers to
 let activeMesh = cube;
 let activeGeometry = cubeGeometry;
@@ -140,48 +143,55 @@ const moveOnXAxis = () =>
     let shiftSize = distance - totalXShift;
     totalXShift += shiftSize;
 
+    // Move globally along the x axis
     activeMesh.position.x += shiftSize;
+
     // activeMesh.position.z -= Math.tan(card.rotation.y) * shiftSize
 
     // TODO - remove this. This was all testing and pretty inefficient
 
-    // let collision = false
-    // let counter = 0;
-    // while (!collision)
-    // {
-    //     if (counter >= 50) {
-    //         // TODO - throw error
-    //         break;
-    //     }
-    //     counter++;
-    //     for (let vertexIndex = 0; vertexIndex < activeGeometry.vertices.length; vertexIndex++)
-    //     {
-    //         // console.log('for loop runs')
-    //         let localVertex = activeGeometry.vertices[vertexIndex].clone();
-    //         let globalVertex = localVertex.applyMatrix4(activeMesh.matrix);
-    //         let directionVector = globalVertex.sub(activeMesh.position);
-    //
-    //         activeGeometry.computeBoundingBox();
-    //         let center = activeGeometry.boundingBox.getCenter();
-    //         activeMesh.localToWorld( center );
-    //
-    //         let ray = new THREE.Raycaster(center, directionVector.clone().normalize());
-    //         let collisionResults = ray.intersectObjects([collisionPlane]);
-    //         if (collisionResults.length > 0)
-    //         {
-    //
-    //             // a collision occurred... do something...
-    //             activeMesh.position.copy( collisionResults[0].point ).add( collisionResults[0].face.normal );
-    //             collision = true;
-    //         }
-    //     }
-    //     console.log(activeMesh.position.z)
-    //     if (!collision)
-    //     {
-    //         // Decrement the z position until a collision occurs
-    //         activeMesh.position.z -= 0.01;
-    //     }
-    // }
+    const downDirectionVector = new THREE.Vector3(0, 0, -1)
+    let extractedRotation = new THREE.Matrix4()
+    activeMesh.matrixWorld.extractRotation( extractedRotation )
+    downDirectionVector.applyMatrix4( extractedRotation )
+
+    let collision = false
+
+    // let localVertex = new THREE.Vector3(activeMesh.position.x, activeMesh.position.y, activeMesh.position.z)
+    // let globalVertex = localVertex.applyMatrix4(activeMesh.matrix);
+    // let directionVector = globalVertex.sub(activeMesh.position);
+    // console.log(collisionPlane.rotation.x)
+    // TODO - STUCK ON HOW TO GET THE DIRECTION VECTOR TO FIND THE COLLISION POINT
+
+    // let centerBase = new THREE.Vector3(activeMesh.position.x, activeMesh.position.y, activeMesh.position.z)
+    // console.log( centerBase );
+
+    let target = new THREE.Vector3();
+    // console.log(activeMesh.position.x)
+    activeMesh.getWorldPosition( target );
+    // console.log(target)
+
+    // let centerTarget = new THREE.Vector3();
+    // activeGeometry.computeBoundingBox();
+    // activeGeometry.boundingBox.getCenter( centerTarget );
+    // // console.log( centerTarget );
+    // activeMesh.localToWorld( centerTarget );
+    // console.log( centerTarget );
+
+    let ray = new THREE.Raycaster(target, downDirectionVector.clone().normalize());
+    let collisionResults = ray.intersectObjects([collisionPlane]);
+    if (collisionResults.length > 0)
+    {
+
+        // a collision occurred... do something...
+        activeMesh.position.copy( collisionResults[0].point ).add( collisionResults[0].face.normal );
+        collision = true;
+    }
+
+    if (!collision)
+    {
+        console.log('no collision!!!!!!');
+    }
 
     // These translate the geometry along its rotated axis
     // console.log(shiftSize);
@@ -274,7 +284,7 @@ const scaleZ = () =>
 
 
 /**
- * Rotate the plane
+ * Rotate the plane - this is a world coordinate rotation
  */
 const rotatePlaneX = () =>
 {
@@ -283,7 +293,7 @@ const rotatePlaneX = () =>
     let rotation = parent.document.getElementById('rotatePlaneX').value * Math.PI / 180;
     // console.log(rotation)
     card.rotation.x = rotation;
-    // collisionPlane.rotation.x = rotation;
+    collisionPlane.rotation.x = rotation;
     initialiseCube();
 }
 const rotatePlaneY = () =>
@@ -293,7 +303,7 @@ const rotatePlaneY = () =>
     let rotation = parent.document.getElementById('rotatePlaneY').value * Math.PI / 180;
     // console.log(rotation)
     card.rotation.y = rotation;
-    // collisionPlane.rotation.y = rotation;
+    collisionPlane.rotation.y = rotation;
     initialiseCube();
 }
 const rotatePlaneZ = () =>
@@ -303,7 +313,7 @@ const rotatePlaneZ = () =>
     let rotation = parent.document.getElementById('rotatePlaneZ').value * Math.PI / 180;
     // console.log(rotation)
     card.rotation.z = rotation;
-    // collisionPlane.rotation.z = rotation;
+    collisionPlane.rotation.z = rotation;
     initialiseCube();
 }
 
@@ -373,6 +383,9 @@ const movePlaneOnZAxis = () =>
 /**
  * Initialise Estimation Objects
  */
+// let totalXRotation = 0;
+// let totalYRotation = 0;
+// let totalZRotation = 0;
 const initialiseCube = () =>
 {
     cardGeometry.computeBoundingBox();
@@ -389,7 +402,18 @@ const initialiseCube = () =>
     cube.rotation.y = card.rotation.y;
     cube.rotation.z = card.rotation.z;
 
-    // This only moves the geometry relative to the location of the origin. NOT the actual location of the origin
+    // let xRotation = totalXRotation - card.rotation.x;
+    // let yRotation = totalYRotation - card.rotation.y;
+    // let zRotation = totalZRotation - card.rotation.z;
+    // totalXRotation = card.rotation.x;
+    // totalYRotation = card.rotation.y;
+    // totalZRotation = card.rotation.z;
+    //
+    // // Local coordinate rotation
+    // cube.rotateX(-xRotation);
+    // cube.rotateY(-yRotation);
+    // cube.rotateZ(-zRotation);
+
     cube.translateZ(1.5);
 }
 
