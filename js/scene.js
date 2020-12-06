@@ -150,10 +150,28 @@ const moveOnXAxis = () =>
 
     // TODO - remove this. This was all testing and pretty inefficient
 
+    activeMesh.updateMatrixWorld()
+
     const downDirectionVector = new THREE.Vector3(0, 0, -1)
     let extractedRotation = new THREE.Matrix4()
-    activeMesh.matrixWorld.extractRotation( extractedRotation )
+    console.log('meshs rotation')
+    const a = new THREE.Euler( activeMesh.rotation.x, activeMesh.rotation.y, activeMesh.rotation.z, 'XYZ' );
+    // let xRotation = activeMesh.rotation.x
+    // let yRotation = activeMesh.rotation.y
+    // let zRotation = activeMesh.rotation.z
+    // // console.log(xRotation)
+    // extractedRotation.makeRotationX(xRotation)
+    // extractedRotation.makeRotationY(yRotation)
+    // extractedRotation.makeRotationZ(zRotation)
+    // extractedRotation.makeRotationX(2)
+    extractedRotation.makeRotationFromEuler( a )
+    console.log('rotation')
+    console.log(extractedRotation)
     downDirectionVector.applyMatrix4( extractedRotation )
+    console.log( downDirectionVector )
+
+    const upTranslationVector = new THREE.Vector3(0, 0, 1.5)
+    upTranslationVector.applyMatrix4( extractedRotation )
 
     let collision = false
 
@@ -178,13 +196,18 @@ const moveOnXAxis = () =>
     // activeMesh.localToWorld( centerTarget );
     // console.log( centerTarget );
 
+    console.log(upTranslationVector.length())
+
     let ray = new THREE.Raycaster(target, downDirectionVector.clone().normalize());
     let collisionResults = ray.intersectObjects([collisionPlane]);
     if (collisionResults.length > 0)
     {
 
         // a collision occurred... do something...
-        activeMesh.position.copy( collisionResults[0].point ).add( collisionResults[0].face.normal );
+        console.log(collisionResults[0].point)
+        console.log(upTranslationVector)
+        activeMesh.position.copy( collisionResults[0].point ).add( upTranslationVector )  //.add( collisionResults[0].face.normal );
+        console.log(activeMesh.position)
         collision = true;
     }
 
@@ -402,6 +425,14 @@ const initialiseCube = () =>
     cube.rotation.y = card.rotation.y;
     cube.rotation.z = card.rotation.z;
 
+    // cubeContainer.position.x = card.position.x;
+    // cubeContainer.position.y = card.position.y;
+    // cubeContainer.position.z = card.position.z;
+    //
+    // cubeContainer.rotation.x = card.rotation.x;
+    // cubeContainer.rotation.y = card.rotation.y;
+    // cubeContainer.rotation.z = card.rotation.z;
+
     // let xRotation = totalXRotation - card.rotation.x;
     // let yRotation = totalYRotation - card.rotation.y;
     // let zRotation = totalZRotation - card.rotation.z;
@@ -413,8 +444,9 @@ const initialiseCube = () =>
     // cube.rotateX(-xRotation);
     // cube.rotateY(-yRotation);
     // cube.rotateZ(-zRotation);
-
+    console.log(cube.position.z)
     cube.translateZ(1.5);
+    console.log(cube.position.z)
 }
 
 
