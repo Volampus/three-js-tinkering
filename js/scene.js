@@ -148,22 +148,14 @@ const moveOnXAxis = () =>
 
     // activeMesh.position.z -= Math.tan(card.rotation.y) * shiftSize
 
-    // TODO - remove this. This was all testing and pretty inefficient
-
+    // TODO - This works, but is kinda inefficient
+    /*
     activeMesh.updateMatrixWorld()
 
     const downDirectionVector = new THREE.Vector3(0, 0, -1)
     let extractedRotation = new THREE.Matrix4()
     console.log('meshs rotation')
     const a = new THREE.Euler( activeMesh.rotation.x, activeMesh.rotation.y, activeMesh.rotation.z, 'XYZ' );
-    // let xRotation = activeMesh.rotation.x
-    // let yRotation = activeMesh.rotation.y
-    // let zRotation = activeMesh.rotation.z
-    // // console.log(xRotation)
-    // extractedRotation.makeRotationX(xRotation)
-    // extractedRotation.makeRotationY(yRotation)
-    // extractedRotation.makeRotationZ(zRotation)
-    // extractedRotation.makeRotationX(2)
     extractedRotation.makeRotationFromEuler( a )
     console.log('rotation')
     console.log(extractedRotation)
@@ -179,7 +171,6 @@ const moveOnXAxis = () =>
     // let globalVertex = localVertex.applyMatrix4(activeMesh.matrix);
     // let directionVector = globalVertex.sub(activeMesh.position);
     // console.log(collisionPlane.rotation.x)
-    // TODO - STUCK ON HOW TO GET THE DIRECTION VECTOR TO FIND THE COLLISION POINT
 
     // let centerBase = new THREE.Vector3(activeMesh.position.x, activeMesh.position.y, activeMesh.position.z)
     // console.log( centerBase );
@@ -214,7 +205,7 @@ const moveOnXAxis = () =>
     if (!collision)
     {
         console.log('no collision!!!!!!');
-    }
+    }*/
 
     // These translate the geometry along its rotated axis
     // console.log(shiftSize);
@@ -586,4 +577,17 @@ function animate()
 
 animate();
 
+/**
+ * Handle iframe resizes
+ */
+const onWindowResize = () => {
+
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize( window.innerWidth, window.innerHeight );
+
+}
+
+window.addEventListener('resize', onWindowResize)
 
