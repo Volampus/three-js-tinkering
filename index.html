@@ -17,12 +17,13 @@
 <div style="position: absolute; display: flex; width: 100%; height: 100%; top: 0; left: 0;">
     <div style="width: 300px; border: 2px solid black; padding: 10px;">
         <!-- UI -->
-        <label for="xSlider">X Slider</label>
+        <label for="xSlider">Forward Slider (Use W and S keys for fine tuning)</label>
         <input type="range" min="-100" max="100" value="0"
                id="xSlider"/>
-        <label for="ySlider">Y Slider</label>
+        <label for="ySlider">Sideways Slider (Use A and D keys for fine tuning)</label>
         <input type="range" min="-100" max="100" value="0"
                id="ySlider"/>
+        <hr />
         <label for="xScaleSlider">X Scale Slider</label>
         <input type="range" min="0" max="100" value="10"
                id="xScaleSlider"/>
@@ -32,6 +33,7 @@
         <label for="zScaleSlider">Z Scale Slider</label>
         <input type="range" min="0" max="100" value="10"
                id="zScaleSlider"/>
+        <hr />
         <input type="button" id="cubeButton" value="Use Cube"/>
         <input type="button" id="hemisphereButton" value="Use Hemisphere"/>
         <br>

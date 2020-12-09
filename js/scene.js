@@ -67,13 +67,13 @@ scene.add(card);
  * Plane - used for collision detection
  * This plane is matched to the orientation of the card but covers the whole screen for collision detection
  */
-const collisionGeometry = new THREE.PlaneGeometry(100, 100, 32, 32);
-const collisionMaterial = new THREE.MeshBasicMaterial({transparent: true, side: THREE.DoubleSide});
-const collisionPlane = new THREE.Mesh(collisionGeometry, collisionMaterial);
-collisionPlane.position.y = -3;
-// plane.rotation.y = 30;
-// plane.rotation.z = 3;
-scene.add(collisionPlane);
+// const collisionGeometry = new THREE.PlaneGeometry(100, 100, 32, 32);
+// const collisionMaterial = new THREE.MeshBasicMaterial({transparent: true, side: THREE.DoubleSide});
+// const collisionPlane = new THREE.Mesh(collisionGeometry, collisionMaterial);
+// collisionPlane.position.y = -3;
+// // plane.rotation.y = 30;
+// // plane.rotation.z = 3;
+// scene.add(collisionPlane);
 
 
 /**
@@ -92,7 +92,7 @@ cube.rotation.y = card.rotation.y;
 cube.rotation.z = card.rotation.z;
 
 // cubeContainer.add(cube);
-scene.add( cube );
+scene.add(cube);
 // Used when determining which object to apply modifiers to
 let activeMesh = cube;
 let activeGeometry = cubeGeometry;
@@ -144,7 +144,7 @@ const moveOnXAxis = () =>
     totalXShift += shiftSize;
 
     // Move globally along the x axis
-    activeMesh.position.x += shiftSize;
+    activeMesh.translateX(shiftSize)
 
     // activeMesh.position.z -= Math.tan(card.rotation.y) * shiftSize
 
@@ -240,7 +240,44 @@ const moveOnYAxis = () =>
     // console.log(shiftSize);
     activeMesh.translateY(shiftSize)
 }
-// TODO - Don't think we need a Z slider
+// Move one increment based on keypress
+const incrementOnXAxis = (i) =>
+{
+    // Move the element
+    let shiftSize = i / 10
+    totalXShift += shiftSize
+    activeMesh.translateX(shiftSize)
+    // Update the slider
+    parent.document.getElementById('xSlider').value = totalXShift * 10;
+}
+// Move one increment based on keypress
+const incrementOnYAxis = (i) =>
+{
+    // Move the element
+    let shiftSize = i / 10
+    totalYShift += shiftSize
+    activeMesh.translateY(shiftSize)
+    // Update the slider
+    parent.document.getElementById('ySlider').value = totalYShift * 10;
+}
+
+const moveOnKeydown = e => {
+    const key = e.key || e.keyCode
+    switch (key) {
+        case 'a':
+            incrementOnXAxis(-1)
+            break;
+        case 'd':
+            incrementOnXAxis(1)
+            break;
+        case 'w':
+            incrementOnYAxis(1)
+            break;
+        case 's':
+            incrementOnYAxis(-1)
+            break;
+    }
+}
 
 
 /**
@@ -307,7 +344,7 @@ const rotatePlaneX = () =>
     let rotation = parent.document.getElementById('rotatePlaneX').value * Math.PI / 180;
     // console.log(rotation)
     card.rotation.x = rotation;
-    collisionPlane.rotation.x = rotation;
+    // collisionPlane.rotation.x = rotation;
     initialiseCube();
 }
 const rotatePlaneY = () =>
@@ -317,7 +354,7 @@ const rotatePlaneY = () =>
     let rotation = parent.document.getElementById('rotatePlaneY').value * Math.PI / 180;
     // console.log(rotation)
     card.rotation.y = rotation;
-    collisionPlane.rotation.y = rotation;
+    // collisionPlane.rotation.y = rotation;
     initialiseCube();
 }
 const rotatePlaneZ = () =>
@@ -327,7 +364,7 @@ const rotatePlaneZ = () =>
     let rotation = parent.document.getElementById('rotatePlaneZ').value * Math.PI / 180;
     // console.log(rotation)
     card.rotation.z = rotation;
-    collisionPlane.rotation.z = rotation;
+    // collisionPlane.rotation.z = rotation;
     initialiseCube();
 }
 
@@ -513,6 +550,17 @@ parent.document.getElementById('movePlaneZ').addEventListener('input', movePlane
 parent.document.getElementById('cubeButton').addEventListener('click', swapToCube);
 parent.document.getElementById('hemisphereButton').addEventListener('click', swapToHemisphere);
 
+// Listeners for keyboard controls
+parent.document.addEventListener('keydown', event => {
+    event.preventDefault() // Prevent the browser from doing other stuff like ctrl+f
+    moveOnKeydown(event)
+});
+document.addEventListener('keydown', event => {
+    event.preventDefault()
+    moveOnKeydown(event)
+});
+
+
 let objects = [circle, backgroundMesh]; // Should probably put these in order for what we want to hit first
 let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
@@ -580,12 +628,13 @@ animate();
 /**
  * Handle iframe resizes
  */
-const onWindowResize = () => {
+const onWindowResize = () =>
+{
 
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
 
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setSize(window.innerWidth, window.innerHeight);
 
 }
 
