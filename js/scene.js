@@ -84,24 +84,21 @@ const cubeContainer = new THREE.Object3D();
 // Here we are using the segment attributes to improve the wireframe
 const cubeGeometry = new THREE.BoxGeometry(3, 3, 3, 5, 5, 5);
 const cubeMaterial = new THREE.MeshStandardMaterial({color: 0x9ff9});
-const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+const cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
 cubeMaterial.wireframe = true;
 // Set the rotation of the cube to match the rotation of the plane
-cube.rotation.x = card.rotation.x;
-cube.rotation.y = card.rotation.y;
-cube.rotation.z = card.rotation.z;
+cubeMesh.rotation.x = card.rotation.x;
+cubeMesh.rotation.y = card.rotation.y;
+cubeMesh.rotation.z = card.rotation.z;
 
 // cubeContainer.add(cube);
-scene.add(cube);
-// Used when determining which object to apply modifiers to
-let activeMesh = cube;
-let activeGeometry = cubeGeometry;
+scene.add(cubeMesh);
 
 
 /**
  * Hemisphere - used for volume estimation
  */
-let hemisphereGeom = new THREE.SphereGeometry(1, 30, 30);
+let hemisphereGeom = new THREE.SphereGeometry(3, 20, 20);
 // Remove each vertex that is below the half way point
 for (let i = 0; i < hemisphereGeom.vertices.length; i++)
 {
@@ -117,19 +114,44 @@ hemisphereGeom.verticesNeedUpdate = true;
 
 
 const hemisphereMaterial = new THREE.MeshStandardMaterial({color: 0x9ff9});
-const hemisphere = new THREE.Mesh(hemisphereGeom, hemisphereMaterial);
+const hemisphereMesh = new THREE.Mesh(hemisphereGeom, hemisphereMaterial);
 hemisphereMaterial.wireframe = true;
 // Set the rotation of the hemisphere to match the rotation of the plane
-hemisphere.rotation.x = card.rotation.x;
-hemisphere.rotation.y = card.rotation.y;
-hemisphere.rotation.z = card.rotation.z;
+hemisphereMesh.rotation.x = card.rotation.x;
+hemisphereMesh.rotation.y = card.rotation.y;
+hemisphereMesh.rotation.z = card.rotation.z;
+
+
+/**
+ * Store data about each object in an array
+ */
+let objectProperties = {
+    active: null,
+    cube: {
+        geom: cubeGeometry,
+        mesh: cubeMesh,
+        totalXShift: 0,
+        totalYShift: 0,
+        totalXScale: 5,
+        totalYScale: 5,
+        totalZScale: 5
+    },
+    hemi: {
+        geom: hemisphereGeom,
+        mesh: hemisphereMesh,
+        totalXShift: 0,
+        totalYShift: 0,
+        totalXScale: 5,
+        totalYScale: 5,
+        totalZScale: 5
+    }
+}
+objectProperties.active = objectProperties.cube
 
 
 /**
  * Move on plane - move an object along a plane relative to the orientation of the card
  */
-let totalXShift = 0;
-let totalYShift = 0;
 // Initialise the sliders to be zero
 parent.document.getElementById('xSlider').value = 0;
 parent.document.getElementById('ySlider').value = 0;
@@ -140,11 +162,11 @@ const moveOnXAxis = () =>
     let distance = parent.document.getElementById('xSlider').value / 10;
     // console.log('value: ' + distance);
     // Make this work as absolute rather than relative movement
-    let shiftSize = distance - totalXShift;
-    totalXShift += shiftSize;
+    let shiftSize = distance - objectProperties.active.totalXShift;
+    objectProperties.active.totalXShift += shiftSize;
 
     // Move globally along the x axis
-    activeMesh.translateX(shiftSize)
+    objectProperties.active.mesh.translateX(shiftSize)
 
     // activeMesh.position.z -= Math.tan(card.rotation.y) * shiftSize
 
@@ -234,31 +256,31 @@ const moveOnYAxis = () =>
     let distance = parent.document.getElementById('ySlider').value / 10;
     // console.log('value: ' + distance);
     // Make this work as absolute rather than relative movement
-    let shiftSize = distance - totalYShift;
-    totalYShift += shiftSize;
+    let shiftSize = distance - objectProperties.active.totalYShift;
+    objectProperties.active.totalYShift += shiftSize;
     // These translate the geometry along its rotated axis
     // console.log(shiftSize);
-    activeMesh.translateY(shiftSize)
+    objectProperties.active.mesh.translateY(shiftSize)
 }
 // Move one increment based on keypress
 const incrementOnXAxis = (i) =>
 {
     // Move the element
     let shiftSize = i / 10
-    totalXShift += shiftSize
-    activeMesh.translateX(shiftSize)
+    objectProperties.active.totalXShift += shiftSize
+    objectProperties.active.mesh.translateX(shiftSize)
     // Update the slider
-    parent.document.getElementById('xSlider').value = totalXShift * 10;
+    parent.document.getElementById('xSlider').value = objectProperties.active.totalXShift * 10;
 }
 // Move one increment based on keypress
 const incrementOnYAxis = (i) =>
 {
     // Move the element
     let shiftSize = i / 10
-    totalYShift += shiftSize
-    activeMesh.translateY(shiftSize)
+    objectProperties.active.totalYShift += shiftSize
+    objectProperties.active.mesh.translateY(shiftSize)
     // Update the slider
-    parent.document.getElementById('ySlider').value = totalYShift * 10;
+    parent.document.getElementById('ySlider').value = objectProperties.active.totalYShift * 10;
 }
 
 const moveOnKeydown = e => {
@@ -283,60 +305,70 @@ const moveOnKeydown = e => {
 /**
  * Scale the object
  */
-let totalXScale = 1;
-let totalYScale = 1;
-let totalZScale = 1;
 // Initialise the sliders to be zero
-parent.document.getElementById('xScaleSlider').value = 10;
-parent.document.getElementById('yScaleSlider').value = 10;
-parent.document.getElementById('zScaleSlider').value = 10;
+parent.document.getElementById('xScaleSlider').value = 50;
+parent.document.getElementById('yScaleSlider').value = 50;
+parent.document.getElementById('zScaleSlider').value = 50;
 const scaleX = () =>
 {
     // Get the scale by id
     // Taking the value from 0 - 100, we can scale up or down by a factor of 10
     let scale = parent.document.getElementById('xScaleSlider').value / 10;
-    // console.log('value: ' + distance);
+    let shiftSize = scale / objectProperties.active.totalXScale
+    objectProperties.active.totalXScale = parent.document.getElementById('xScaleSlider').value / 10;
     // Make this work as absolute rather than relative movement
-    if (scale !== 0)
-    {
-        let shiftSize = scale / totalXScale;
-        totalXScale *= shiftSize;
-        activeGeometry.scale(shiftSize, 1, 1);
-    }
+    objectProperties.active.geom.scale(shiftSize, 1, 1)
 }
 const scaleY = () =>
 {
     // Get the scale by id
     // Taking the value from 0 - 100, we can scale up or down by a factor of 10
     let scale = parent.document.getElementById('yScaleSlider').value / 10;
-    // console.log('value: ' + distance);
+    let shiftSize = scale / objectProperties.active.totalYScale
+    objectProperties.active.totalYScale = parent.document.getElementById('yScaleSlider').value / 10;
     // Make this work as absolute rather than relative movement
-    if (scale !== 0)
-    {
-        let shiftSize = scale / totalYScale;
-        totalYScale *= shiftSize;
-        activeGeometry.scale(1, shiftSize, 1);
-    }
+    objectProperties.active.geom.scale(1, shiftSize, 1)
 }
 const scaleZ = () =>
 {
     // Get the scale by id
     // Taking the value from 0 - 100, we can scale up or down by a factor of 10
     let scale = parent.document.getElementById('zScaleSlider').value / 10;
-    // console.log('value: ' + distance);
+    let shiftSize = scale / objectProperties.active.totalZScale
+    objectProperties.active.totalZScale = parent.document.getElementById('zScaleSlider').value / 10;
     // Make this work as absolute rather than relative movement
-    if (scale !== 0)
-    {
-        let shiftSize = scale / totalZScale;
-        totalZScale *= shiftSize;
-        activeGeometry.scale(1, 1, shiftSize);
-    }
+    objectProperties.active.geom.scale(1, 1, shiftSize)
+}
+const resetScale = () =>
+{
+    parent.document.getElementById('xScaleSlider').value = 50;
+    parent.document.getElementById('yScaleSlider').value = 50;
+    parent.document.getElementById('zScaleSlider').value = 50;
+    let scale = 5
+    let shiftSize = scale / objectProperties.active.totalXScale
+    objectProperties.active.totalXScale = parent.document.getElementById('xScaleSlider').value / 10;
+    // Make this work as absolute rather than relative movement
+    objectProperties.active.geom.scale(shiftSize, 1, 1)
+
+    shiftSize = scale / objectProperties.active.totalYScale
+    objectProperties.active.totalYScale = parent.document.getElementById('yScaleSlider').value / 10;
+    // Make this work as absolute rather than relative movement
+    objectProperties.active.geom.scale(1, shiftSize, 1)
+
+    shiftSize = scale / objectProperties.active.totalZScale
+    objectProperties.active.totalZScale = parent.document.getElementById('zScaleSlider').value / 10;
+    // Make this work as absolute rather than relative movement
+    objectProperties.active.geom.scale(1, 1, shiftSize)
 }
 
 
 /**
  * Rotate the plane - this is a world coordinate rotation
  */
+// Initialise the sliders to be zero
+parent.document.getElementById('rotatePlaneX').value = 0;
+parent.document.getElementById('rotatePlaneY').value = 0;
+parent.document.getElementById('rotatePlaneZ').value = 0;
 const rotatePlaneX = () =>
 {
     // Receive input in the range of (-90) - 90
@@ -345,7 +377,8 @@ const rotatePlaneX = () =>
     // console.log(rotation)
     card.rotation.x = rotation;
     // collisionPlane.rotation.x = rotation;
-    initialiseCube();
+    initialiseObjects('cube');
+    initialiseObjects('hemi');
 }
 const rotatePlaneY = () =>
 {
@@ -355,7 +388,8 @@ const rotatePlaneY = () =>
     // console.log(rotation)
     card.rotation.y = rotation;
     // collisionPlane.rotation.y = rotation;
-    initialiseCube();
+    initialiseObjects('cube');
+    initialiseObjects('hemi');
 }
 const rotatePlaneZ = () =>
 {
@@ -365,20 +399,9 @@ const rotatePlaneZ = () =>
     // console.log(rotation)
     card.rotation.z = rotation;
     // collisionPlane.rotation.z = rotation;
-    initialiseCube();
+    initialiseObjects('cube');
+    initialiseObjects('hemi');
 }
-
-// Update the Mesh so that it matches the rotation of the card
-const updateMeshRotation = () =>
-{
-    cube.rotation.x = card.rotation.x;
-    cube.rotation.y = card.rotation.y;
-    cube.rotation.z = card.rotation.z;
-    hemisphere.rotation.x = card.rotation.x;
-    hemisphere.rotation.y = card.rotation.y;
-    hemisphere.rotation.z = card.rotation.z;
-}
-
 
 /**
  * Move the plane
@@ -434,47 +457,21 @@ const movePlaneOnZAxis = () =>
 /**
  * Initialise Estimation Objects
  */
-// let totalXRotation = 0;
-// let totalYRotation = 0;
-// let totalZRotation = 0;
-const initialiseCube = () =>
+const initialiseObjects = (objectType) =>
 {
-    cardGeometry.computeBoundingBox();
-    let center = new THREE.Vector3(0, 0, 0);
-    cardGeometry.boundingBox.getCenter(center);
-    // console.log('local center: ' + JSON.stringify(center))
-    card.localToWorld(center);
-    // console.log('global center: ' + JSON.stringify(center));
-    cube.position.x = card.position.x;
-    cube.position.y = card.position.y;
-    cube.position.z = card.position.z;
+    console.log(objectType)
+    objectProperties[objectType].mesh.position.x = card.position.x;
+    objectProperties[objectType].mesh.position.y = card.position.y;
+    objectProperties[objectType].mesh.position.z = card.position.z;
 
-    cube.rotation.x = card.rotation.x;
-    cube.rotation.y = card.rotation.y;
-    cube.rotation.z = card.rotation.z;
+    objectProperties[objectType].mesh.rotation.x = card.rotation.x;
+    objectProperties[objectType].mesh.rotation.y = card.rotation.y;
+    objectProperties[objectType].mesh.rotation.z = card.rotation.z;
 
-    // cubeContainer.position.x = card.position.x;
-    // cubeContainer.position.y = card.position.y;
-    // cubeContainer.position.z = card.position.z;
-    //
-    // cubeContainer.rotation.x = card.rotation.x;
-    // cubeContainer.rotation.y = card.rotation.y;
-    // cubeContainer.rotation.z = card.rotation.z;
-
-    // let xRotation = totalXRotation - card.rotation.x;
-    // let yRotation = totalYRotation - card.rotation.y;
-    // let zRotation = totalZRotation - card.rotation.z;
-    // totalXRotation = card.rotation.x;
-    // totalYRotation = card.rotation.y;
-    // totalZRotation = card.rotation.z;
-    //
-    // // Local coordinate rotation
-    // cube.rotateX(-xRotation);
-    // cube.rotateY(-yRotation);
-    // cube.rotateZ(-zRotation);
-    console.log(cube.position.z)
-    cube.translateZ(1.5);
-    console.log(cube.position.z)
+    if (objectType === 'cube')
+    {
+        objectProperties[objectType].mesh.translateZ(1.5);
+    }
 }
 
 
@@ -507,23 +504,28 @@ circle.callback = () =>
 /**
  * Functions to swap active shape
  */
-// TODO - reset sliders
 const swapToCube = () =>
 {
-    scene.remove(hemisphere);
-    scene.add(cube);
-    initialiseCube();
-    activeMesh = cube;
-    activeGeometry = cubeGeometry;
+    scene.remove(hemisphereMesh);
+    scene.add(cubeMesh);
+    parent.document.getElementById('xSlider').value = objectProperties.cube.totalXShift * 10;
+    parent.document.getElementById('ySlider').value = objectProperties.cube.totalYShift * 10;
+    parent.document.getElementById('xScaleSlider').value = objectProperties.cube.totalXScale * 10;
+    parent.document.getElementById('yScaleSlider').value = objectProperties.cube.totalYScale * 10;
+    parent.document.getElementById('zScaleSlider').value = objectProperties.cube.totalZScale * 10;
+    objectProperties.active = objectProperties.cube;
 }
 
 const swapToHemisphere = () =>
 {
-    scene.remove(cube);
-    scene.add(hemisphere);
-    // TODO - initialise
-    activeMesh = hemisphere;
-    activeGeometry = hemisphereGeom;
+    scene.remove(cubeMesh);
+    scene.add(hemisphereMesh);
+    parent.document.getElementById('xSlider').value = objectProperties.hemi.totalXShift * 10;
+    parent.document.getElementById('ySlider').value = objectProperties.hemi.totalYShift * 10;
+    parent.document.getElementById('xScaleSlider').value = objectProperties.hemi.totalXScale * 10;
+    parent.document.getElementById('yScaleSlider').value = objectProperties.hemi.totalYScale * 10;
+    parent.document.getElementById('zScaleSlider').value = objectProperties.hemi.totalZScale * 10;
+    objectProperties.active = objectProperties.hemi;
 }
 
 
@@ -537,6 +539,7 @@ parent.document.getElementById('ySlider').addEventListener('input', moveOnYAxis)
 parent.document.getElementById('xScaleSlider').addEventListener('input', scaleX);
 parent.document.getElementById('yScaleSlider').addEventListener('input', scaleY);
 parent.document.getElementById('zScaleSlider').addEventListener('input', scaleZ);
+parent.document.getElementById('resetScale').addEventListener('click', resetScale);
 
 parent.document.getElementById('rotatePlaneX').addEventListener('input', rotatePlaneX);
 parent.document.getElementById('rotatePlaneY').addEventListener('input', rotatePlaneY);
