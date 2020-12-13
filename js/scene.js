@@ -96,7 +96,7 @@ cubeMesh.rotation.y = card.rotation.y
 cubeMesh.rotation.z = card.rotation.z
 
 // cubeContainer.add(cube);
-scene.add(cubeMesh)
+// scene.add(cubeMesh)
 
 /**
  * Hemisphere - used for volume estimation
@@ -439,7 +439,6 @@ const movePlaneOnZAxis = () => {
  * Initialise Estimation Objects
  */
 const initialiseObjects = (objectType) => {
-  console.log(objectType)
   objectProperties[objectType].mesh.position.x = card.position.x
   objectProperties[objectType].mesh.position.y = card.position.y
   objectProperties[objectType].mesh.position.z = card.position.z
@@ -502,6 +501,17 @@ const swapToHemisphere = () => {
 }
 
 /**
+ * Proceed to the volume estimation
+ */
+const proceedToEstimation = () => {
+  initialiseObjects('cube')
+  initialiseObjects('hemi')
+  swapToCube()
+  parent.document.getElementById('plane').style.display = 'none'
+  parent.document.getElementById('estimation').style.display = 'block'
+}
+
+/**
  * Click handler
  * https://stackoverflow.com/questions/12800150/catch-the-click-event-on-a-specific-mesh-in-the-renderer
  */
@@ -523,6 +533,8 @@ parent.document.getElementById('movePlaneZ').addEventListener('input', movePlane
 
 parent.document.getElementById('cubeButton').addEventListener('click', swapToCube)
 parent.document.getElementById('hemisphereButton').addEventListener('click', swapToHemisphere)
+
+parent.document.getElementById('proceed').addEventListener('click', proceedToEstimation)
 
 // Listeners for keyboard controls
 parent.document.addEventListener('keydown', (event) => {
