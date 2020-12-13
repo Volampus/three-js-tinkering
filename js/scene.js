@@ -134,6 +134,7 @@ let objectProperties = {
     mesh: cubeMesh,
     totalXShift: 0,
     totalYShift: 0,
+    zTranslation: (3 / 2.5 - 2.5 * (3 / 2.5)) * 0.5,
   },
   hemi: {
     name: 'hemi',
@@ -141,6 +142,7 @@ let objectProperties = {
     mesh: hemisphereMesh,
     totalXShift: 0,
     totalYShift: 0,
+    zTranslation: 0,
   },
 }
 objectProperties.active = objectProperties.cube
@@ -336,7 +338,12 @@ const scaleZ = () => {
   // Taking the value from 0 - 100, we can scale up or down by a factor of 5
   let scale = parent.document.getElementById('zScaleSlider').value / 20
   objectProperties.active.mesh.scale.setZ(scale)
-  // TODO - need to translate Z so that the base stays on rescale
+  if (objectProperties.active.name === 'cube') {
+    console.log('runs')
+    // Get the height lost and shift by half of that
+    objectProperties.active.mesh.translateZ(-((3 / 2.5 - scale * (3 / 2.5)) * 0.5 - objectProperties.active.zTranslation))
+    objectProperties.active.zTranslation = (3 / 2.5 - scale * (3 / 2.5)) * 0.5
+  }
   calculateVolume()
 }
 const resetScale = () => {
@@ -345,6 +352,14 @@ const resetScale = () => {
   parent.document.getElementById('zScaleSlider').value = 50
 
   objectProperties.active.mesh.scale.set(2.5, 2.5, 2.5)
+
+  let scale = 2.5
+  if (objectProperties.active.name === 'cube') {
+    // Get the height lost and shift by half of that
+    objectProperties.active.mesh.translateZ(-((3 / 2.5 - scale * (3 / 2.5)) * 0.5 - objectProperties.active.zTranslation))
+    objectProperties.active.zTranslation = (3 / 2.5 - scale * (3 / 2.5)) * 0.5
+  }
+
   calculateVolume()
 }
 
