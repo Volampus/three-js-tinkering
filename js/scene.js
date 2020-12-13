@@ -135,6 +135,9 @@ let objectProperties = {
     totalXShift: 0,
     totalYShift: 0,
     zTranslation: (3 / 2.5 - 2.5 * (3 / 2.5)) * 0.5,
+    currentXScale: 2.5,
+    currentYScale: 2.5,
+    currentZScale: 2.5,
   },
   hemi: {
     name: 'hemi',
@@ -143,6 +146,9 @@ let objectProperties = {
     totalXShift: 0,
     totalYShift: 0,
     zTranslation: 0,
+    currentXScale: 1,
+    currentYScale: 1,
+    currentZScale: 1,
   },
 }
 objectProperties.active = objectProperties.cube
@@ -324,6 +330,7 @@ const scaleX = () => {
   let scale = parent.document.getElementById('xScaleSlider').value / 20
   objectProperties.active.xScale = scale
   objectProperties.active.mesh.scale.setX(scale)
+  objectProperties.active.currentXScale = scale
   calculateVolume()
 }
 const scaleY = () => {
@@ -331,6 +338,7 @@ const scaleY = () => {
   // Taking the value from 0 - 100, we can scale up or down by a factor of 5
   let scale = parent.document.getElementById('yScaleSlider').value / 20
   objectProperties.active.mesh.scale.setY(scale)
+  objectProperties.active.currentYScale = scale
   calculateVolume()
 }
 const scaleZ = () => {
@@ -339,11 +347,11 @@ const scaleZ = () => {
   let scale = parent.document.getElementById('zScaleSlider').value / 20
   objectProperties.active.mesh.scale.setZ(scale)
   if (objectProperties.active.name === 'cube') {
-    console.log('runs')
     // Get the height lost and shift by half of that
     objectProperties.active.mesh.translateZ(-((3 / 2.5 - scale * (3 / 2.5)) * 0.5 - objectProperties.active.zTranslation))
     objectProperties.active.zTranslation = (3 / 2.5 - scale * (3 / 2.5)) * 0.5
   }
+  objectProperties.active.currentZScale = scale
   calculateVolume()
 }
 const resetScale = () => {
@@ -351,15 +359,15 @@ const resetScale = () => {
   parent.document.getElementById('yScaleSlider').value = 50
   parent.document.getElementById('zScaleSlider').value = 50
 
-  objectProperties.active.mesh.scale.set(2.5, 2.5, 2.5)
-
-  let scale = 2.5
   if (objectProperties.active.name === 'cube') {
+    let scale = 2.5
+    objectProperties.active.mesh.scale.set(2.5, 2.5, 2.5)
     // Get the height lost and shift by half of that
     objectProperties.active.mesh.translateZ(-((3 / 2.5 - scale * (3 / 2.5)) * 0.5 - objectProperties.active.zTranslation))
     objectProperties.active.zTranslation = (3 / 2.5 - scale * (3 / 2.5)) * 0.5
+  } else if (objectProperties.active.name === 'hemi') {
+    objectProperties.active.mesh.scale.set(1, 1, 1)
   }
-
   calculateVolume()
 }
 
@@ -496,9 +504,9 @@ const swapToCube = () => {
   scene.add(cubeMesh)
   parent.document.getElementById('xSlider').value = objectProperties.cube.totalXShift * 10
   parent.document.getElementById('ySlider').value = objectProperties.cube.totalYShift * 10
-  parent.document.getElementById('xScaleSlider').value = objectProperties.cube.totalXScale * 10
-  parent.document.getElementById('yScaleSlider').value = objectProperties.cube.totalYScale * 10
-  parent.document.getElementById('zScaleSlider').value = objectProperties.cube.totalZScale * 10
+  parent.document.getElementById('xScaleSlider').value = objectProperties.cube.currentXScale * 20
+  parent.document.getElementById('yScaleSlider').value = objectProperties.cube.currentYScale * 20
+  parent.document.getElementById('zScaleSlider').value = objectProperties.cube.currentZScale * 20
   objectProperties.active = objectProperties.cube
   calculateVolume()
 }
@@ -508,9 +516,9 @@ const swapToHemisphere = () => {
   scene.add(hemisphereMesh)
   parent.document.getElementById('xSlider').value = objectProperties.hemi.totalXShift * 10
   parent.document.getElementById('ySlider').value = objectProperties.hemi.totalYShift * 10
-  parent.document.getElementById('xScaleSlider').value = objectProperties.hemi.totalXScale * 10
-  parent.document.getElementById('yScaleSlider').value = objectProperties.hemi.totalYScale * 10
-  parent.document.getElementById('zScaleSlider').value = objectProperties.hemi.totalZScale * 10
+  parent.document.getElementById('xScaleSlider').value = objectProperties.hemi.currentXScale * 20
+  parent.document.getElementById('yScaleSlider').value = objectProperties.hemi.currentYScale * 20
+  parent.document.getElementById('zScaleSlider').value = objectProperties.hemi.currentZScale * 20
   objectProperties.active = objectProperties.hemi
   calculateVolume()
 }
