@@ -60,9 +60,10 @@ backgroundImage.onload = () => {
  * Plane - used for the card, an example of how it can be positioned and rotated is here
  */
 // This is the dimension ratio of the card taken from my measurements
-const cardGeometry = new THREE.PlaneGeometry(8.5 / 2, 5 / 2, 32, 32)
+const cardGeometry = new THREE.PlaneGeometry(8.5, 5, 32, 32)
 const cardMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00, side: THREE.DoubleSide })
 const card = new THREE.Mesh(cardGeometry, cardMaterial)
+card.scale.set(0.5, 0.5)
 card.position.y = -3
 // plane.rotation.y = 30;
 // plane.rotation.z = 3;
@@ -86,9 +87,10 @@ scene.add(card)
 // Create a container for the cube
 const cubeContainer = new THREE.Object3D()
 // Here we are using the segment attributes to improve the wireframe
-const cubeGeometry = new THREE.BoxGeometry(3, 3, 3, 5, 5, 5)
+const cubeGeometry = new THREE.BoxGeometry(3 / 2.5, 3 / 2.5, 3 / 2.5, 5, 5, 5)
 const cubeMaterial = new THREE.MeshStandardMaterial({ color: 0x9ff9 })
 const cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial)
+cubeMesh.scale.set(2.5, 2.5, 2.5)
 cubeMaterial.wireframe = true
 // Set the rotation of the cube to match the rotation of the plane
 cubeMesh.rotation.x = card.rotation.x
@@ -295,9 +297,16 @@ const moveOnKeydown = (e) => {
  * Calculate the volume
  */
 const calculateVolume = () => {
+  let volume = 0
   if (objectProperties.active.name === 'cube') {
-    // Set in the DOM
+    // Scale * original size * two (the card is at half scale)
+    let xSize = objectProperties.active.mesh.scale.x * (3 / 2.5) * 2
+    let ySize = objectProperties.active.mesh.scale.y * (3 / 2.5) * 2
+    let zSize = objectProperties.active.mesh.scale.z * (3 / 2.5) * 2
+    volume = xSize * ySize * zSize
   }
+  // Set it in the DOM
+  parent.document.getElementById('volume').textContent = volume.toString()
 }
 
 /**
@@ -311,26 +320,32 @@ const scaleX = () => {
   // Get the scale by id
   // Taking the value from 0 - 100, we can scale up or down by a factor of 5
   let scale = parent.document.getElementById('xScaleSlider').value / 20
-  objectProperties.active.mesh.scale.set(scale, 1, 1)
+  objectProperties.active.xScale = scale
+  objectProperties.active.mesh.scale.setX(scale)
+  calculateVolume()
 }
 const scaleY = () => {
   // Get the scale by id
   // Taking the value from 0 - 100, we can scale up or down by a factor of 5
   let scale = parent.document.getElementById('yScaleSlider').value / 20
-  objectProperties.active.mesh.scale.set(1, scale, 1)
+  objectProperties.active.mesh.scale.setY(scale)
+  calculateVolume()
 }
 const scaleZ = () => {
   // Get the scale by id
   // Taking the value from 0 - 100, we can scale up or down by a factor of 5
   let scale = parent.document.getElementById('zScaleSlider').value / 20
-  objectProperties.active.mesh.scale.set(1, 1, scale)
+  objectProperties.active.mesh.scale.setZ(scale)
+  // TODO - need to translate Z so that the base stays on rescale
+  calculateVolume()
 }
 const resetScale = () => {
   parent.document.getElementById('xScaleSlider').value = 50
   parent.document.getElementById('yScaleSlider').value = 50
   parent.document.getElementById('zScaleSlider').value = 50
 
-  objectProperties.active.mesh.scale.set(1, 1, 1)
+  objectProperties.active.mesh.scale.set(2.5, 2.5, 2.5)
+  calculateVolume()
 }
 
 /**
@@ -470,6 +485,7 @@ const swapToCube = () => {
   parent.document.getElementById('yScaleSlider').value = objectProperties.cube.totalYScale * 10
   parent.document.getElementById('zScaleSlider').value = objectProperties.cube.totalZScale * 10
   objectProperties.active = objectProperties.cube
+  calculateVolume()
 }
 
 const swapToHemisphere = () => {
@@ -481,6 +497,7 @@ const swapToHemisphere = () => {
   parent.document.getElementById('yScaleSlider').value = objectProperties.hemi.totalYScale * 10
   parent.document.getElementById('zScaleSlider').value = objectProperties.hemi.totalZScale * 10
   objectProperties.active = objectProperties.hemi
+  calculateVolume()
 }
 
 /**

@@ -14,7 +14,7 @@
   </head>
   <body>
     <div style="position: absolute; display: flex; width: 100%; height: 100%; top: 0; left: 0">
-      <div style="width: 300px; border: 2px solid black; padding: 10px;">
+      <div style="width: 300px; border: 2px solid black; padding: 10px">
         <div id="estimation" style="display: none">
           <!-- UI -->
           <label for="ySlider">Forward Slider (Use W and S keys for fine tuning)</label>
@@ -32,6 +32,8 @@
           <hr />
           <input type="button" id="cubeButton" value="Use Cube" />
           <input type="button" id="hemisphereButton" value="Use Hemisphere" />
+          <hr />
+          <p>Volume: <span id="volume"></span> cm<sup>3</sup></p>
         </div>
         <div id="plane">
           <h3>Plane Manipulation</h3>
