@@ -313,6 +313,15 @@ const calculateVolume = () => {
     let zSize = objectProperties.active.mesh.scale.z * (3 / 2.5) * 2
     volume = xSize * ySize * zSize
   }
+  if (objectProperties.active.name === 'hemi') {
+    // Scale * original size * two (the card is at half scale)
+    let xSize = objectProperties.active.mesh.scale.x * 3 * 2
+    let ySize = objectProperties.active.mesh.scale.y * 3 * 2
+    let zSize = objectProperties.active.mesh.scale.z * 3 * 2
+    // https://en.wikipedia.org/wiki/Ellipsoid#Volume
+    // We have half an ellipsoid once manipulated
+    volume = (4 / 3) * Math.PI * xSize * ySize * zSize * 0.5
+  }
   // Set it in the DOM
   parent.document.getElementById('volume').textContent = volume.toString()
 }
@@ -355,11 +364,10 @@ const scaleZ = () => {
   calculateVolume()
 }
 const resetScale = () => {
-  parent.document.getElementById('xScaleSlider').value = 50
-  parent.document.getElementById('yScaleSlider').value = 50
-  parent.document.getElementById('zScaleSlider').value = 50
-
   if (objectProperties.active.name === 'cube') {
+    parent.document.getElementById('xScaleSlider').value = 50
+    parent.document.getElementById('yScaleSlider').value = 50
+    parent.document.getElementById('zScaleSlider').value = 50
     let scale = 2.5
     objectProperties.active.mesh.scale.set(2.5, 2.5, 2.5)
     // Get the height lost and shift by half of that
@@ -368,6 +376,9 @@ const resetScale = () => {
   } else if (objectProperties.active.name === 'hemi') {
     objectProperties.active.mesh.scale.set(1, 1, 1)
   }
+  parent.document.getElementById('xScaleSlider').value = 20
+  parent.document.getElementById('yScaleSlider').value = 20
+  parent.document.getElementById('zScaleSlider').value = 20
   calculateVolume()
 }
 
