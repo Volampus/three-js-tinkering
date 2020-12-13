@@ -127,22 +127,18 @@ hemisphereMesh.rotation.z = card.rotation.z
 let objectProperties = {
   active: null,
   cube: {
+    name: 'cube',
     geom: cubeGeometry,
     mesh: cubeMesh,
     totalXShift: 0,
     totalYShift: 0,
-    totalXScale: 5,
-    totalYScale: 5,
-    totalZScale: 5,
   },
   hemi: {
+    name: 'hemi',
     geom: hemisphereGeom,
     mesh: hemisphereMesh,
     totalXShift: 0,
     totalYShift: 0,
-    totalXScale: 5,
-    totalYScale: 5,
-    totalZScale: 5,
   },
 }
 objectProperties.active = objectProperties.cube
@@ -296,6 +292,15 @@ const moveOnKeydown = (e) => {
 }
 
 /**
+ * Calculate the volume
+ */
+const calculateVolume = () => {
+  if (objectProperties.active.name === 'cube') {
+    // Set in the DOM
+  }
+}
+
+/**
  * Scale the object
  */
 // Initialise the sliders to be zero
@@ -304,50 +309,28 @@ parent.document.getElementById('yScaleSlider').value = 50
 parent.document.getElementById('zScaleSlider').value = 50
 const scaleX = () => {
   // Get the scale by id
-  // Taking the value from 0 - 100, we can scale up or down by a factor of 10
-  let scale = parent.document.getElementById('xScaleSlider').value / 10
-  let shiftSize = scale / objectProperties.active.totalXScale
-  objectProperties.active.totalXScale = parent.document.getElementById('xScaleSlider').value / 10
-  // Make this work as absolute rather than relative movement
-  objectProperties.active.geom.scale(shiftSize, 1, 1)
+  // Taking the value from 0 - 100, we can scale up or down by a factor of 5
+  let scale = parent.document.getElementById('xScaleSlider').value / 20
+  objectProperties.active.mesh.scale.set(scale, 1, 1)
 }
 const scaleY = () => {
   // Get the scale by id
-  // Taking the value from 0 - 100, we can scale up or down by a factor of 10
-  let scale = parent.document.getElementById('yScaleSlider').value / 10
-  let shiftSize = scale / objectProperties.active.totalYScale
-  objectProperties.active.totalYScale = parent.document.getElementById('yScaleSlider').value / 10
-  // Make this work as absolute rather than relative movement
-  objectProperties.active.geom.scale(1, shiftSize, 1)
+  // Taking the value from 0 - 100, we can scale up or down by a factor of 5
+  let scale = parent.document.getElementById('yScaleSlider').value / 20
+  objectProperties.active.mesh.scale.set(1, scale, 1)
 }
 const scaleZ = () => {
   // Get the scale by id
-  // Taking the value from 0 - 100, we can scale up or down by a factor of 10
-  let scale = parent.document.getElementById('zScaleSlider').value / 10
-  let shiftSize = scale / objectProperties.active.totalZScale
-  objectProperties.active.totalZScale = parent.document.getElementById('zScaleSlider').value / 10
-  // Make this work as absolute rather than relative movement
-  objectProperties.active.geom.scale(1, 1, shiftSize)
+  // Taking the value from 0 - 100, we can scale up or down by a factor of 5
+  let scale = parent.document.getElementById('zScaleSlider').value / 20
+  objectProperties.active.mesh.scale.set(1, 1, scale)
 }
 const resetScale = () => {
   parent.document.getElementById('xScaleSlider').value = 50
   parent.document.getElementById('yScaleSlider').value = 50
   parent.document.getElementById('zScaleSlider').value = 50
-  let scale = 5
-  let shiftSize = scale / objectProperties.active.totalXScale
-  objectProperties.active.totalXScale = parent.document.getElementById('xScaleSlider').value / 10
-  // Make this work as absolute rather than relative movement
-  objectProperties.active.geom.scale(shiftSize, 1, 1)
 
-  shiftSize = scale / objectProperties.active.totalYScale
-  objectProperties.active.totalYScale = parent.document.getElementById('yScaleSlider').value / 10
-  // Make this work as absolute rather than relative movement
-  objectProperties.active.geom.scale(1, shiftSize, 1)
-
-  shiftSize = scale / objectProperties.active.totalZScale
-  objectProperties.active.totalZScale = parent.document.getElementById('zScaleSlider').value / 10
-  // Make this work as absolute rather than relative movement
-  objectProperties.active.geom.scale(1, 1, shiftSize)
+  objectProperties.active.mesh.scale.set(1, 1, 1)
 }
 
 /**
